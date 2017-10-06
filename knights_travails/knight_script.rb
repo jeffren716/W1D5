@@ -1,11 +1,16 @@
-
+require_relative "../skeleton/lib/00_tree_node.rb"
 require 'byebug'
+
+
 class KnightPathFinder
+
+  attr_reader :move_tree
 
   def initialize(start_position)
     @start_position = start_position
     @visited_positions = [start_position]
-
+    @move_tree = build_move_tree(start_position)
+    return nil
   end
 
   def self.valid_moves(pos)
@@ -34,5 +39,24 @@ class KnightPathFinder
     moves.reject! { |position| @visited_positions.include?(position) }
     @visited_positions.concat(moves)
     moves
+  end
+
+  def build_move_tree(root)
+    root_node = PolyTreeNode.new(root)
+    tree = [root_node]
+    queue = [root_node]
+    until queue.empty?
+      current = queue.shift
+      new_node_positions = new_move_positions(current.value)
+      nodes = []
+      new_node_positions.each do |position|
+        node = PolyTreeNode.new(position)
+        node.parent = current
+        nodes << node
+      end
+      queue.concat(nodes)
+      tree.concat(nodes)
+    end
+    tree
   end
 end
